@@ -7,6 +7,7 @@ import {
   ReadResourceResultSchema,
   CallToolResultSchema,
   ListPromptsResultSchema,
+  Resource,
   Tool,
   ClientRequest,
 } from "mcp-typescript/types.js";
@@ -34,7 +35,7 @@ import {
 import ConsoleTab from "./components/ConsoleTab";
 import Sidebar from "./components/Sidebar";
 import RequestsTab from "./components/RequestsTabs";
-import ResourcesTab, { Resource } from "./components/ResourcesTab";
+import ResourcesTab from "./components/ResourcesTab";
 import NotificationsTab from "./components/NotificationsTab";
 import PromptsTab, { Prompt } from "./components/PromptsTab";
 import ToolsTab from "./components/ToolsTab";
@@ -108,7 +109,7 @@ const App = () => {
     }
   };
 
-  const readResource = async (uri: string) => {
+  const readResource = async (uri: URL) => {
     const response = await makeRequest(
       {
         method: "resources/read" as const,
