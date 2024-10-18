@@ -23,6 +23,7 @@ import {
   MessageSquare,
   Hammer,
   Play,
+  X,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
@@ -223,6 +224,10 @@ const App = () => {
     }
   };
 
+  const clearError = () => {
+    setError(null);
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar connectionStatus={connectionStatus} />
@@ -272,6 +277,15 @@ const App = () => {
                   Connect
                 </Button>
               </div>
+              {error && (
+                <div className="mt-2 flex items-center">
+                  <p className="text-red-500 mr-2">{error}</p>
+                  <Button onClick={clearError} variant="outline" size="sm">
+                    <X className="w-4 h-4" />
+                    Clear Error
+                  </Button>
+                </div>
+              )}
             </div>
             {mcpClient ? (
               <Tabs defaultValue="resources" className="w-full p-4">
