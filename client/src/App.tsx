@@ -69,10 +69,7 @@ const App = () => {
     );
   });
   const [args, setArgs] = useState<string>(() => {
-    return (
-      localStorage.getItem("lastArgs") ||
-      "/Users/ashwin/code/mcp/example-servers/build/everything/stdio.js"
-    );
+    return localStorage.getItem("lastArgs") || "";
   });
   const [url, setUrl] = useState<string>("http://localhost:3001/sse");
   const [transportType, setTransportType] = useState<"stdio" | "sse">("stdio");
