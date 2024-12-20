@@ -1,15 +1,15 @@
-import '@testing-library/jest-dom'
-import { expect, afterEach, vi } from 'vitest'
-import { cleanup } from '@testing-library/react'
-import * as matchers from '@testing-library/jest-dom/matchers'
+import "@testing-library/jest-dom";
+import { expect, afterEach, vi } from "vitest";
+import { cleanup } from "@testing-library/react";
+import * as matchers from "@testing-library/jest-dom/matchers";
 
 // @ts-ignore
-expect.extend(matchers)
+expect.extend(matchers);
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
+  value: vi.fn().mockImplementation((query) => ({
     matches: false,
     media: query,
     onchange: null,
@@ -19,16 +19,16 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
   })),
-})
+});
 
 // Mock window.location.hash
-Object.defineProperty(window, 'location', {
+Object.defineProperty(window, "location", {
   writable: true,
-  value: { hash: '' }
-})
+  value: { hash: "" },
+});
 
 afterEach(() => {
-  cleanup()
-  vi.clearAllMocks()
-  window.location.hash = ''
-})
+  cleanup();
+  vi.clearAllMocks();
+  window.location.hash = "";
+});
