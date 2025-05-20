@@ -248,6 +248,7 @@ export function useConnection({
       throw e;
     }
   };
+  // test
 
   const handleAuthError = async (error: unknown) => {
     if (error instanceof SseError && error.code === 401) {
@@ -375,9 +376,9 @@ export function useConnection({
       const clientTransport =
         transportType === "streamable-http"
           ? new StreamableHTTPClientTransport(mcpProxyServerUrl as URL, {
-              sessionId: undefined,
-              ...transportOptions,
-            })
+            sessionId: undefined,
+            ...transportOptions,
+          })
           : new SSEClientTransport(mcpProxyServerUrl as URL, transportOptions);
 
       if (onNotification) {
