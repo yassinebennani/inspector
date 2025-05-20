@@ -376,9 +376,9 @@ export function useConnection({
       const clientTransport =
         transportType === "streamable-http"
           ? new StreamableHTTPClientTransport(mcpProxyServerUrl as URL, {
-            sessionId: undefined,
-            ...transportOptions,
-          })
+              sessionId: undefined,
+              ...transportOptions,
+            })
           : new SSEClientTransport(mcpProxyServerUrl as URL, transportOptions);
 
       if (onNotification) {
