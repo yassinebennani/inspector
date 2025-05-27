@@ -231,7 +231,8 @@ describe("Output Schema Validation", () => {
           description: "Tool with invalid schema",
           inputSchema: { type: "object", properties: {} },
           outputSchema: {
-            type: "invalid-type" as any,
+            // @ts-expect-error Testing with invalid type
+            type: "invalid-type",
           },
         },
       ];

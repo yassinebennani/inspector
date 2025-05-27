@@ -104,7 +104,7 @@ const ToolsTab = ({
           message: "Parsed JSON does not match structured content",
         };
       }
-    } catch (e) {
+    } catch {
       return {
         isCompatible: false,
         message: "Unstructured content is not valid JSON",
