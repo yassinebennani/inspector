@@ -22,7 +22,10 @@ export function cacheToolOutputSchemas(tools: Tool[]): void {
         const validator = ajv.compile(tool.outputSchema);
         toolOutputValidators.set(tool.name, validator);
       } catch (error) {
-        console.warn(`Failed to compile output schema for tool ${tool.name}:`, error);
+        console.warn(
+          `Failed to compile output schema for tool ${tool.name}:`,
+          error,
+        );
       }
     }
   }
@@ -34,7 +37,9 @@ export function cacheToolOutputSchemas(tools: Tool[]): void {
  * @param toolName Name of the tool
  * @returns The compiled validator function, or undefined if not found
  */
-export function getToolOutputValidator(toolName: string): ValidateFunction | undefined {
+export function getToolOutputValidator(
+  toolName: string,
+): ValidateFunction | undefined {
   return toolOutputValidators.get(toolName);
 }
 
@@ -47,7 +52,7 @@ export function getToolOutputValidator(toolName: string): ValidateFunction | und
  */
 export function validateToolOutput(
   toolName: string,
-  structuredContent: unknown
+  structuredContent: unknown,
 ): { isValid: boolean; error?: string } {
   const validator = getToolOutputValidator(toolName);
   if (!validator) {

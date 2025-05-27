@@ -7,7 +7,11 @@ import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import DynamicJsonForm from "./DynamicJsonForm";
 import type { JsonValue, JsonSchemaType } from "@/utils/jsonUtils";
-import { generateDefaultValue, validateToolOutput, hasOutputSchema } from "@/utils/schemaUtils";
+import {
+  generateDefaultValue,
+  validateToolOutput,
+  hasOutputSchema,
+} from "@/utils/schemaUtils";
 import {
   CallToolResultSchema,
   CompatibilityCallToolResult,
@@ -56,13 +60,20 @@ const ToolsTab = ({
   // Check compatibility between structured and unstructured content
   const checkContentCompatibility = (
     structuredContent: unknown,
-    unstructuredContent: Array<{ type: string; text?: string; [key: string]: unknown }>
+    unstructuredContent: Array<{
+      type: string;
+      text?: string;
+      [key: string]: unknown;
+    }>,
   ): { isCompatible: boolean; message: string } => {
     // Check if unstructured content is a single text block
-    if (unstructuredContent.length !== 1 || unstructuredContent[0].type !== "text") {
+    if (
+      unstructuredContent.length !== 1 ||
+      unstructuredContent[0].type !== "text"
+    ) {
       return {
         isCompatible: false,
-        message: "Unstructured content is not a single text block"
+        message: "Unstructured content is not a single text block",
       };
     }
 
@@ -70,32 +81,33 @@ const ToolsTab = ({
     if (!textContent) {
       return {
         isCompatible: false,
-        message: "Text content is empty"
+        message: "Text content is empty",
       };
     }
 
     try {
       // Try to parse the text as JSON
       const parsedContent = JSON.parse(textContent);
-      
+
       // Deep equality check
-      const isEqual = JSON.stringify(parsedContent) === JSON.stringify(structuredContent);
-      
+      const isEqual =
+        JSON.stringify(parsedContent) === JSON.stringify(structuredContent);
+
       if (isEqual) {
         return {
           isCompatible: true,
-          message: "Unstructured content matches structured content"
+          message: "Unstructured content matches structured content",
         };
       } else {
         return {
           isCompatible: false,
-          message: "Parsed JSON does not match structured content"
+          message: "Parsed JSON does not match structured content",
         };
       }
     } catch (e) {
       return {
         isCompatible: false,
-        message: "Unstructured content is not valid JSON"
+        message: "Unstructured content is not valid JSON",
       };
     }
   };
@@ -122,31 +134,38 @@ const ToolsTab = ({
 
       // Validate structured content if present and tool has output schema
       let validationResult = null;
-      const toolHasOutputSchema = selectedTool && hasOutputSchema(selectedTool.name);
-      
+      const toolHasOutputSchema =
+        selectedTool && hasOutputSchema(selectedTool.name);
+
       if (toolHasOutputSchema) {
         if (!structuredResult.structuredContent && !isError) {
           // Tool has output schema but didn't return structured content (and it's not an error)
           validationResult = {
             isValid: false,
-            error: "Tool has an output schema but did not return structured content"
+            error:
+              "Tool has an output schema but did not return structured content",
           };
         } else if (structuredResult.structuredContent) {
           // Validate the structured content
-          validationResult = validateToolOutput(selectedTool.name, structuredResult.structuredContent);
+          validationResult = validateToolOutput(
+            selectedTool.name,
+            structuredResult.structuredContent,
+          );
         }
       }
 
       // Check compatibility if both structured and unstructured content exist
       // AND the tool has an output schema
       let compatibilityResult = null;
-      if (structuredResult.structuredContent && 
-          structuredResult.content.length > 0 && 
-          selectedTool && 
-          hasOutputSchema(selectedTool.name)) {
+      if (
+        structuredResult.structuredContent &&
+        structuredResult.content.length > 0 &&
+        selectedTool &&
+        hasOutputSchema(selectedTool.name)
+      ) {
         compatibilityResult = checkContentCompatibility(
           structuredResult.structuredContent,
-          structuredResult.content
+          structuredResult.content,
         );
       }
 
@@ -162,46 +181,55 @@ const ToolsTab = ({
           </h4>
           {structuredResult.structuredContent && (
             <div className="mb-4">
-              <h5 className="font-semibold mb-2 text-sm">Structured Content:</h5>
+              <h5 className="font-semibold mb-2 text-sm">
+                Structured Content:
+              </h5>
               <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-lg">
                 <JsonView data={structuredResult.structuredContent} />
                 {validationResult && (
-                  <div className={`mt-2 p-2 rounded text-sm ${
-                    validationResult.isValid 
-                      ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200" 
-                      : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
-                  }`}>
+                  <div
+                    className={`mt-2 p-2 rounded text-sm ${
+                      validationResult.isValid
+                        ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                        : "bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200"
+                    }`}
+                  >
                     {validationResult.isValid ? (
                       "✓ Valid according to output schema"
                     ) : (
-                      <>
-                        ✗ Validation Error: {validationResult.error}
-                      </>
+                      <>✗ Validation Error: {validationResult.error}</>
                     )}
                   </div>
                 )}
               </div>
             </div>
           )}
-          {!structuredResult.structuredContent && validationResult && !validationResult.isValid && (
-            <div className="mb-4">
-              <div className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-2 rounded text-sm">
-                ✗ Validation Error: {validationResult.error}
+          {!structuredResult.structuredContent &&
+            validationResult &&
+            !validationResult.isValid && (
+              <div className="mb-4">
+                <div className="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 p-2 rounded text-sm">
+                  ✗ Validation Error: {validationResult.error}
+                </div>
               </div>
-            </div>
-          )}
+            )}
           {structuredResult.content.length > 0 && (
             <div className="mb-4">
               {structuredResult.structuredContent && (
                 <>
-                  <h5 className="font-semibold mb-2 text-sm">Unstructured Content:</h5>
+                  <h5 className="font-semibold mb-2 text-sm">
+                    Unstructured Content:
+                  </h5>
                   {compatibilityResult && (
-                    <div className={`mb-2 p-2 rounded text-sm ${
-                      compatibilityResult.isCompatible 
-                        ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200" 
-                        : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
-                    }`}>
-                      {compatibilityResult.isCompatible ? "✓" : "⚠"} {compatibilityResult.message}
+                    <div
+                      className={`mb-2 p-2 rounded text-sm ${
+                        compatibilityResult.isCompatible
+                          ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                          : "bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200"
+                      }`}
+                    >
+                      {compatibilityResult.isCompatible ? "✓" : "⚠"}{" "}
+                      {compatibilityResult.message}
                     </div>
                   )}
                 </>
@@ -211,25 +239,25 @@ const ToolsTab = ({
                   {item.type === "text" && (
                     <JsonView data={item.text} isError={isError} />
                   )}
-              {item.type === "image" && (
-                <img
-                  src={`data:${item.mimeType};base64,${item.data}`}
-                  alt="Tool result image"
-                  className="max-w-full h-auto"
-                />
-              )}
-              {item.type === "resource" &&
-                (item.resource?.mimeType?.startsWith("audio/") ? (
-                  <audio
-                    controls
-                    src={`data:${item.resource.mimeType};base64,${item.resource.blob}`}
-                    className="w-full"
-                  >
-                    <p>Your browser does not support audio playback</p>
-                  </audio>
-                ) : (
-                  <JsonView data={item.resource} />
-                ))}
+                  {item.type === "image" && (
+                    <img
+                      src={`data:${item.mimeType};base64,${item.data}`}
+                      alt="Tool result image"
+                      className="max-w-full h-auto"
+                    />
+                  )}
+                  {item.type === "resource" &&
+                    (item.resource?.mimeType?.startsWith("audio/") ? (
+                      <audio
+                        controls
+                        src={`data:${item.resource.mimeType};base64,${item.resource.blob}`}
+                        className="w-full"
+                      >
+                        <p>Your browser does not support audio playback</p>
+                      </audio>
+                    ) : (
+                      <JsonView data={item.resource} />
+                    ))}
                 </div>
               ))}
             </div>
@@ -395,7 +423,9 @@ const ToolsTab = ({
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => setIsOutputSchemaExpanded(!isOutputSchemaExpanded)}
+                        onClick={() =>
+                          setIsOutputSchemaExpanded(!isOutputSchemaExpanded)
+                        }
                         className="h-6 px-2"
                       >
                         {isOutputSchemaExpanded ? (
@@ -411,9 +441,13 @@ const ToolsTab = ({
                         )}
                       </Button>
                     </div>
-                    <div className={`transition-all ${
-                      isOutputSchemaExpanded ? "" : "max-h-[8rem] overflow-y-auto"
-                    }`}>
+                    <div
+                      className={`transition-all ${
+                        isOutputSchemaExpanded
+                          ? ""
+                          : "max-h-[8rem] overflow-y-auto"
+                      }`}
+                    >
                       <JsonView data={selectedTool.outputSchema} />
                     </div>
                   </div>
