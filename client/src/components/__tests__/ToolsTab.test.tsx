@@ -1,36 +1,15 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { describe, it, expect, jest } from "@jest/globals";
 import "@testing-library/jest-dom";
+import { describe, it, jest, beforeEach } from "@jest/globals";
 import ToolsTab from "../ToolsTab";
 import { Tool } from "@modelcontextprotocol/sdk/types.js";
 import { Tabs } from "@/components/ui/tabs";
-import * as schemaUtils from "@/utils/schemaUtils";
-
-// Mock the schemaUtils module
-// Note: hasOutputSchema checks if a tool's output schema validator has been compiled and cached
-// by cacheToolOutputSchemas. In these tests, we mock it to avoid needing to call
-// cacheToolOutputSchemas for every test that uses tools with output schemas.
-// This keeps the tests focused on the component's behavior rather than schema compilation.
-jest.mock("@/utils/schemaUtils", () => ({
-  ...jest.requireActual("@/utils/schemaUtils"),
-  hasOutputSchema: jest.fn(),
-  validateToolOutput: jest.fn(),
-}));
+import { cacheToolOutputSchemas } from "@/utils/schemaUtils";
 
 describe("ToolsTab", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset to default behavior
-    (schemaUtils.hasOutputSchema as jest.Mock).mockImplementation(
-      (toolName) => {
-        // Only tools with outputSchema property should return true
-        return false;
-      },
-    );
-    (schemaUtils.validateToolOutput as jest.Mock).mockReturnValue({
-      isValid: true,
-      error: null,
-    });
+    // Clear the output schema cache before each test
+    cacheToolOutputSchemas([]);
   });
 
   const mockTools: Tool[] = [
@@ -250,8 +229,8 @@ describe("ToolsTab", () => {
     };
 
     it("should display structured content when present", () => {
-      // Mock hasOutputSchema to return true for this tool
-      (schemaUtils.hasOutputSchema as jest.Mock).mockReturnValue(true);
+      // Cache the tool's output schema so hasOutputSchema returns true
+      cacheToolOutputSchemas([toolWithOutputSchema]);
 
       const structuredResult = {
         content: [],
@@ -272,13 +251,7 @@ describe("ToolsTab", () => {
     });
 
     it("should show validation error for invalid structured content", () => {
-      // Mock hasOutputSchema to return true for this tool
-      (schemaUtils.hasOutputSchema as jest.Mock).mockReturnValue(true);
-      // Mock the validation to fail
-      (schemaUtils.validateToolOutput as jest.Mock).mockReturnValue({
-        isValid: false,
-        error: "temperature must be number",
-      });
+      cacheToolOutputSchemas([toolWithOutputSchema]);
 
       const invalidResult = {
         content: [],
@@ -296,8 +269,7 @@ describe("ToolsTab", () => {
     });
 
     it("should show error when tool with output schema doesn't return structured content", () => {
-      // Mock hasOutputSchema to return true for this tool
-      (schemaUtils.hasOutputSchema as jest.Mock).mockReturnValue(true);
+      cacheToolOutputSchemas([toolWithOutputSchema]);
 
       const resultWithoutStructured = {
         content: [{ type: "text", text: "some result" }],
@@ -317,8 +289,7 @@ describe("ToolsTab", () => {
     });
 
     it("should show unstructured content title when both structured and unstructured exist", () => {
-      // Mock hasOutputSchema to return true for this tool
-      (schemaUtils.hasOutputSchema as jest.Mock).mockReturnValue(true);
+      cacheToolOutputSchemas([toolWithOutputSchema]);
 
       const resultWithBoth = {
         content: [{ type: "text", text: '{"temperature": 25}' }],
@@ -350,8 +321,7 @@ describe("ToolsTab", () => {
     });
 
     it("should show compatibility check when tool has output schema", () => {
-      // Mock hasOutputSchema to return true for this tool
-      (schemaUtils.hasOutputSchema as jest.Mock).mockReturnValue(true);
+      cacheToolOutputSchemas([toolWithOutputSchema]);
 
       const compatibleResult = {
         content: [{ type: "text", text: '{"temperature": 25}' }],
